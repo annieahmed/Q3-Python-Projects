@@ -1,0 +1,6 @@
+# Virtual Environment
+venv/
+personal-library-manager/venv/
+__pycache__/
+*.pyc
+.DS_Store 
