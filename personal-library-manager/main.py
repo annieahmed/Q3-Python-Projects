@@ -4,10 +4,10 @@ import json
 class BookCollection:
     """A class to manage a collection of books, allowing users to store and organize their reading materials."""
 
-    def __init__(self):
+    def __init__(self): 
         """Initialize a new book collection with an empty list and set up file storage."""
         self.book_list = []
-        self.storage_file = "books_data.json"
+        self.storage_file = "book_data.json"
         self.read_from_file()
 
     def read_from_file(self):
@@ -158,5 +158,6 @@ class BookCollection:
 
 
 if __name__ == "__main__":
+
     book_manager = BookCollection()
     book_manager.start_application()
