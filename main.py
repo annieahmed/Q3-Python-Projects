@@ -1,5 +1,10 @@
 import json
+from colorama import init, Fore, Style
+from rich.console import Console
+from rich.table import Table
 
+# Initialize colorama
+init()
 
 class BookCollection:
     """A class to manage a collection of books, allowing users to store and organize their reading materials."""
@@ -7,12 +12,12 @@ class BookCollection:
     def __init__(self): 
         """Initialize a new book collection with an empty list and set up file storage."""
         self.book_list = []
-        self.storage_file = "book_data.json"
+        self.storage_file = "books_data.json"
+        self.console = Console()
         self.read_from_file()
 
     def read_from_file(self):
-        """Load saved books from a JSON file into memory.
-        If the file doesn't exist or is corrupted, start with an empty collection."""
+        """Load saved books from a JSON file into memory."""
         try:
             with open(self.storage_file, "r") as file:
                 self.book_list = json.load(file)
@@ -26,13 +31,12 @@ class BookCollection:
 
     def create_new_book(self):
         """Add a new book to the collection by gathering information from the user."""
-        book_title = input("Enter book title: ")
-        book_author = input("Enter author: ")
-        publication_year = input("Enter publication year: ")
-        book_genre = input("Enter genre: ")
-        is_book_read = (
-            input("Have you read this book? (yes/no): ").strip().lower() == "yes"
-        )
+        self.console.print("\n[bold cyan]Add New Book[/bold cyan]")
+        book_title = input(f"{Fore.CYAN}Enter book title: {Style.RESET_ALL}")
+        book_author = input(f"{Fore.CYAN}Enter author: {Style.RESET_ALL}")
+        publication_year = input(f"{Fore.CYAN}Enter publication year: {Style.RESET_ALL}")
+        book_genre = input(f"{Fore.CYAN}Enter genre: {Style.RESET_ALL}")
+        is_book_read = input(f"{Fore.CYAN}Have you read this book? (yes/no): {Style.RESET_ALL}").strip().lower() == "yes"
 
         new_book = {
             "title": book_title,
@@ -44,24 +48,26 @@ class BookCollection:
 
         self.book_list.append(new_book)
         self.save_to_file()
-        print("Book added successfully!\n")
+        self.console.print("[bold green]Book added successfully![/bold green]\n")
 
     def delete_book(self):
         """Remove a book from the collection using its title."""
-        book_title = input("Enter the title of the book to remove: ")
+        self.console.print("\n[bold red]Delete Book[/bold red]")
+        book_title = input(f"{Fore.RED}Enter the title of the book to remove: {Style.RESET_ALL}")
 
         for book in self.book_list:
             if book["title"].lower() == book_title.lower():
                 self.book_list.remove(book)
                 self.save_to_file()
-                print("Book removed successfully!\n")
+                self.console.print("[bold green]Book removed successfully![/bold green]\n")
                 return
-        print("Book not found!\n")
+        self.console.print("[bold red]Book not found![/bold red]\n")
 
     def find_book(self):
         """Search for books in the collection by title or author name."""
-        search_type = input("Search by:\n1. Title\n2. Author\nEnter your choice: ")
-        search_text = input("Enter search term: ").lower()
+        self.console.print("\n[bold yellow]Search Books[/bold yellow]")
+        search_type = input(f"{Fore.YELLOW}Search by:\n1. Title\n2. Author\nEnter your choice: {Style.RESET_ALL}")
+        search_text = input(f"{Fore.YELLOW}Enter search term: {Style.RESET_ALL}").lower()
         found_books = [
             book
             for book in self.book_list
@@ -70,72 +76,96 @@ class BookCollection:
         ]
 
         if found_books:
-            print("Matching Books:")
+            table = Table(title="Matching Books")
+            table.add_column("No.", style="cyan")
+            table.add_column("Title", style="magenta")
+            table.add_column("Author", style="green")
+            table.add_column("Year", style="blue")
+            table.add_column("Genre", style="yellow")
+            table.add_column("Status", style="red")
+
             for index, book in enumerate(found_books, 1):
                 reading_status = "Read" if book["read"] else "Unread"
-                print(
-                    f"{index}. {book['title']} by {book['author']} ({book['year']}) - {book['genre']} - {reading_status}"
+                table.add_row(
+                    str(index),
+                    book["title"],
+                    book["author"],
+                    book["year"],
+                    book["genre"],
+                    reading_status
                 )
+            self.console.print(table)
         else:
-            print("No matching books found.\n")
+            self.console.print("[bold red]No matching books found.[/bold red]\n")
 
     def update_book(self):
         """Modify the details of an existing book in the collection."""
-        book_title = input("Enter the title of the book you want to edit: ")
+        self.console.print("\n[bold blue]Update Book[/bold blue]")
+        book_title = input(f"{Fore.BLUE}Enter the title of the book you want to edit: {Style.RESET_ALL}")
         for book in self.book_list:
             if book["title"].lower() == book_title.lower():
-                print("Leave blank to keep existing value.")
-                book["title"] = input(f"New title ({book['title']}): ") or book["title"]
-                book["author"] = (
-                    input(f"New author ({book['author']}): ") or book["author"]
-                )
-                book["year"] = input(f"New year ({book['year']}): ") or book["year"]
-                book["genre"] = input(f"New genre ({book['genre']}): ") or book["genre"]
-                book["read"] = (
-                    input("Have you read this book? (yes/no): ").strip().lower()
-                    == "yes"
-                )
+                self.console.print("[bold yellow]Leave blank to keep existing value.[/bold yellow]")
+                book["title"] = input(f"{Fore.BLUE}New title ({book['title']}): {Style.RESET_ALL}") or book["title"]
+                book["author"] = input(f"{Fore.BLUE}New author ({book['author']}): {Style.RESET_ALL}") or book["author"]
+                book["year"] = input(f"{Fore.BLUE}New year ({book['year']}): {Style.RESET_ALL}") or book["year"]
+                book["genre"] = input(f"{Fore.BLUE}New genre ({book['genre']}): {Style.RESET_ALL}") or book["genre"]
+                book["read"] = input(f"{Fore.BLUE}Have you read this book? (yes/no): {Style.RESET_ALL}").strip().lower() == "yes"
                 self.save_to_file()
-                print("Book updated successfully!\n")
+                self.console.print("[bold green]Book updated successfully![/bold green]\n")
                 return
-        print("Book not found!\n")
+        self.console.print("[bold red]Book not found![/bold red]\n")
 
     def show_all_books(self):
         """Display all books in the collection with their details."""
         if not self.book_list:
-            print("Your collection is empty.\n")
+            self.console.print("[bold red]Your collection is empty.[/bold red]\n")
             return
 
-        print("Your Book Collection:")
+        table = Table(title="Your Book Collection")
+        table.add_column("No.", style="cyan")
+        table.add_column("Title", style="magenta")
+        table.add_column("Author", style="green")
+        table.add_column("Year", style="blue")
+        table.add_column("Genre", style="yellow")
+        table.add_column("Status", style="red")
+
         for index, book in enumerate(self.book_list, 1):
             reading_status = "Read" if book["read"] else "Unread"
-            print(
-                f"{index}. {book['title']} by {book['author']} ({book['year']}) - {book['genre']} - {reading_status}"
+            table.add_row(
+                str(index),
+                book["title"],
+                book["author"],
+                book["year"],
+                book["genre"],
+                reading_status
             )
+        self.console.print(table)
         print()
 
     def show_reading_progress(self):
         """Calculate and display statistics about your reading progress."""
         total_books = len(self.book_list)
         completed_books = sum(1 for book in self.book_list if book["read"])
-        completion_rate = (
-            (completed_books / total_books * 100) if total_books > 0 else 0
-        )
-        print(f"Total books in collection: {total_books}")
-        print(f"Reading progress: {completion_rate:.2f}%\n")
+        completion_rate = (completed_books / total_books * 100) if total_books > 0 else 0
+        
+        self.console.print("\n[bold cyan]Reading Progress[/bold cyan]")
+        self.console.print(f"[bold]Total books in collection:[/bold] {total_books}")
+        self.console.print(f"[bold]Books read:[/bold] {completed_books}")
+        self.console.print(f"[bold]Reading progress:[/bold] {completion_rate:.2f}%\n")
 
     def start_application(self):
         """Run the main application loop with a user-friendly menu interface."""
         while True:
-            print("📚 Welcome to Your Book Collection Manager! 📚")
-            print("1. Add a new book")
-            print("2. Remove a book")
-            print("3. Search for books")
-            print("4. Update book details")
-            print("5. View all books")
-            print("6. View reading progress")
-            print("7. Exit")
-            user_choice = input("Please choose an option (1-7): ")
+            self.console.print("[bold magenta]📚 Welcome to Your Book Collection Manager! 📚[/bold magenta]")
+            self.console.print("[cyan]1.[/cyan] Add a new book")
+            self.console.print("[cyan]2.[/cyan] Remove a book")
+            self.console.print("[cyan]3.[/cyan] Search for books")
+            self.console.print("[cyan]4.[/cyan] Update book details")
+            self.console.print("[cyan]5.[/cyan] View all books")
+            self.console.print("[cyan]6.[/cyan] View reading progress")
+            self.console.print("[cyan]7.[/cyan] Exit")
+            
+            user_choice = input(f"{Fore.CYAN}Please choose an option (1-7): {Style.RESET_ALL}")
 
             if user_choice == "1":
                 self.create_new_book()
@@ -151,13 +181,12 @@ class BookCollection:
                 self.show_reading_progress()
             elif user_choice == "7":
                 self.save_to_file()
-                print("Thank you for using Book Collection Manager. Goodbye!")
+                self.console.print("[bold green]Thank you for using Book Collection Manager. Goodbye![/bold green]")
                 break
             else:
-                print("Invalid choice. Please try again.\n")
+                self.console.print("[bold red]Invalid choice. Please try again.[/bold red]\n")
 
 
 if __name__ == "__main__":
-
     book_manager = BookCollection()
     book_manager.start_application()
