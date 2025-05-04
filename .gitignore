@@ -1,8 +1,0 @@
-# Virtual Environment
-venv/
-personal-library-manager/venv/
-growth-mindsat-uv/venv/
-growth-mindsat-uv/data-cleaner/venv/
-__pycache__/
-*.pyc
-.DS_Store 
