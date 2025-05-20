@@ -34,3 +34,8 @@ MediGuide is an intelligent web application that helps users find recommended me
 ```bash
 git clone https://github.com//mediguide.git
 cd mediguide
+pip install -r requirements.txt
+streamlit run app.py
+🙋‍♀️ Made By
+Annie Ahmed
+🎓 Python Developer | UI Designer | Healthcare Tech Enthusiast
